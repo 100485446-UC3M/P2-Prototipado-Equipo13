@@ -1,0 +1,28 @@
+const fs = require('fs').promises;
+
+async function getRoutines(preferences) {
+    try{
+    const Filedata = await fs.readFile('DataBases/routines.json', 'utf-8');
+    const routines = JSON.parse(Filedata);
+    let selectedRoutine = {};
+    
+     // Iterar sobre cada preferencia del usuario (asumimos que la data viene con un campo de preferencias)
+     data.preferences.forEach(muscle => {
+        if (routines[muscle]) {
+            selectedRoutines[muscle] = routines[muscle]; // Agregar rutina al resultado
+        }
+    });
+
+    if (Object.keys(selectedRoutines).length === 0) {
+        socket.emit('routine_response', { error: "No se encontraron rutinas para estas preferencias." });
+        return{ error: "No se encontraron rutinas para estas preferencias." };
+    }
+    return selectedRoutines;
+    
+} catch (error) {
+    console.error('Error al obtener las rutinas:', error.message);
+    return { error: "Error al cargar las rutinas." };
+}
+}
+
+module.exports = { getRoutines };

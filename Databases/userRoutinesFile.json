@@ -1,0 +1,9 @@
+{
+    "AO3F5Y7": {
+        "routine": {
+            "name": "Leg Day",
+            "exercises": ["Squats", "Lunges", "Leg Press"]
+        },
+        "currentStep": 1
+    }
+}
