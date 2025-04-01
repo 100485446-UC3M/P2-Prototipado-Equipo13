@@ -1,0 +1,12 @@
+{
+    "Pierna": {
+        "ejercicio1": "Sentadillas",
+        "ejercicio2": "Prensa de piernas",
+        "ejercicio3": "Estocadas"
+    },
+    "Brazo": {
+        "ejercicio1": "Curl de bíceps",
+        "ejercicio2": "Fondos en paralelas",
+        "ejercicio3": "Press de hombros"
+    }
+}
