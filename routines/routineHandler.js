@@ -1,17 +1,14 @@
 const userRoutinesFile = 'DataBases/userRoutines.json';
 const RoutinesFile = 'DataBases/routines.json';
+var userRoutines = {}; 
 
-//Funcion para agregar ejercicios
+//Funcion para agregar rutinas
 async function addRoutine(data){
 
     const { routineName, muscleGroup, exercises } = data;
     if (!routineName || !muscleGroup || !exercises || typeof exercises !== 'object' || Object.keys(exercises).length === 0) {
         console.error(`Datos inválidos recibidos en 'addRoutine' de ${socket.id}:`, data);
-        socket.emit('addRoutine_response', {
-            success: false,
-            message: 'Datos inválidos. Se requiere routineName, muscleGroup y un objeto exercises no vacío.'
-        });
-        return;
+        return {error:'Datos inválidos. Se requiere routineName, muscleGroup y un objeto exercises no vacío.'};
     }
 
     const Filedata = await fs.readFile(RoutinesFile, 'utf-8');
@@ -78,7 +75,6 @@ async function getRoutines(preferences) {
     });
 
     if (Object.keys(selectedRoutines).length === 0) {
-        socket.emit('routine_response', { error: "No se encontraron rutinas para estas preferencias." });
         return{ error: "No se encontraron rutinas para estas preferencias." };
     }
     return selectedRoutines;
@@ -89,8 +85,9 @@ async function getRoutines(preferences) {
 }
 }
 
-// Function to save routines to JSON file
-async function saveUserRoutines() {
+// Función para guardar en el JSON file
+async function saveUserRoutines(data) {
+    userRoutines[data.UserId] = data.routine; // Asignar rutina al usuario
     try {
         await fs.writeFile(userRoutinesFile, JSON.stringify(userRoutines, null, 2), 'utf-8');
     } catch (error) {

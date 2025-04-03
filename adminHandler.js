@@ -1,19 +1,20 @@
 const fs = require('fs').promises;
-const credentials = 'DataBases/adminCredentials.json';
+const credentials = 'DataBases/credentials.json';
 
-async function addAdminCredential(){
+//Registrar nuevo admin
+async function addAdminCredential(data){
     // Validación básica de entrada
-    if (!username || typeof username !== 'string' || username.trim() === '') {
+    if (!data.username || typeof data.username !== 'string' || data.username.trim() === '') {
         console.error("Error al añadir admin: El nombre de usuario no puede estar vacío.");
         return false;
     }
-    if (password === undefined || password === null || String(password).trim() === '') {
-        console.error(`Error al añadir admin '${username}': La contraseña no puede estar vacía.`);
+    if (data.password === undefined || data.password === null || String(data.password).trim() === '') {
+        console.error(`Error al añadir admin '${data.username}': La contraseña no puede estar vacía.`);
         return false;
     }
     // Evitar añadir "Admins" o "Users" como usernames si causa confusión
-    if (username === 'Admins' || username === 'Users') {
-        console.error(`Error al añadir admin: '${username}' es una clave reservada.`);
+    if (data.username === 'Admins' || data.username === 'Users') {
+        console.error(`Error al añadir admin: '${data.username}' es una clave reservada.`);
         return false;
     }
 
@@ -64,21 +65,21 @@ async function addAdminCredential(){
         }
 
         // Verificar si el administrador ya existe 
-        if (allCredentials.Admins.hasOwnProperty(username)) {
-            console.warn(`Error al añadir admin: El usuario '${username}' ya existe en la sección Admins.`);
+        if (allCredentials.Admins.hasOwnProperty(data.username)) {
+            console.warn(`Error al añadir admin: El usuario '${data.username}' ya existe en la sección Admins.`);
             return false; 
         }
 
         // Añadir el nuevo administrador 
         // Guardamos la contraseña dentro de un array, como en el formato original
-        allCredentials.Admins[username] = [password];
-        console.log(`Admin '${username}' preparado para ser añadido.`);
+        allCredentials.Admins[data.username] = [data.password];
+        console.log(`Admin '${data.username}' preparado para ser añadido.`);
 
         // Escribir en el archivo 
         try {
             const jsonData = JSON.stringify(allCredentials, null, 2); // Formatear JSON
             await fs.writeFile(CREDENTIALS_FILE_PATH, jsonData, 'utf-8');
-            console.log(`Admin '${username}' añadido exitosamente a ${path.basename(CREDENTIALS_FILE_PATH)}.`);
+            console.log(`Admin '${data.username}' añadido exitosamente a ${path.basename(CREDENTIALS_FILE_PATH)}.`);
             return true; // Éxito
         } catch (writeError) {
             console.error(`Error fatal al escribir en el archivo de credenciales: ${writeError.message}`);
@@ -96,12 +97,12 @@ async function addAdminCredential(){
     }
 }
 
-
-async function checkAdminCredentials(username, password) {
-    console.log(`Verificando credenciales para usuario: ${username}`);
+//Chequear si alguien es admin
+async function checkAdminCredentials(data) {
+    console.log(`Verificando credenciales para usuario: ${data.username}`);
 
     // Validación básica de entrada
-    if (!username || password === undefined || password === null) {
+    if (!data.username || data.password === undefined || data.password === null) {
         console.warn("Intento de verificación con username o password faltantes.");
         return 0; // No se puede verificar sin ambos datos
     }
@@ -138,28 +139,28 @@ async function checkAdminCredentials(username, password) {
          // Obtener el objeto específico de credenciales de administrador
          const adminCredentials = allCredentials.Admins;
 
-         if (adminCredentials.hasOwnProperty(username)) {
-            const storedPasswordArray = adminCredentials[username];
+         if (adminCredentials.hasOwnProperty(data.username)) {
+            const storedPasswordArray = adminCredentials[data.username];
             //  Verificar si el valor asociado es realmente un array
             if (Array.isArray(storedPasswordArray)) {
 
                 // Verificar si la contraseña proporcionada está incluida en el array
-                if (storedPasswordArray.includes(password)) {
-                    console.log(`Credenciales de ADMIN válidas para el usuario: ${username}.`);
+                if (storedPasswordArray.includes(data.password)) {
+                    console.log(`Credenciales de ADMIN válidas para el usuario: ${data.username}.`);
                     return 1; // Credenciales correctas
                 } else {
                     // Contraseña incorrecta para un admin existente
-                    console.log(`Contraseña de ADMIN incorrecta para el usuario: ${username}.`);
+                    console.log(`Contraseña de ADMIN incorrecta para el usuario: ${data.username}.`);
                     return 0;
                 }
             } else {
                 // El formato es incorrecto para este admin (no es un array)
-                console.warn(`Formato inválido en ${path.basename(CREDENTIALS_FILE_PATH)} para el ADMIN '${username}'. Se esperaba un array de contraseñas.`);
+                console.warn(`Formato inválido en ${path.basename(CREDENTIALS_FILE_PATH)} para el ADMIN '${data.username}'. Se esperaba un array de contraseñas.`);
                 return -1
             }
         } else {
             // El nombre de usuario admin no existe en la sección "Admins"
-            console.log(`Usuario ADMIN '${username}' no encontrado en la sección 'Admins'.`);
+            console.log(`Usuario ADMIN '${data.username}' no encontrado en la sección 'Admins'.`);
             return 0;
         }
 

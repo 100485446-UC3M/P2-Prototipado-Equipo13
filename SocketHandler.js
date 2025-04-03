@@ -6,7 +6,6 @@ const fs = require('fs').promises;
 const { getRoutines, getNextExercise, addRoutine, saveUserRoutines } = require('./routines/routineHandler'); // Importar la función para manejar rutinas
 const { addAdminCredential, checkAdminCredentials} = require('./adminHandler');
 const {addToStat}  = require('./socialHandler');
-var userRoutines = {}; 
 
 const userStateFile = 'DataBases/userStateFile.json'; // Persiste info temporal de la conexión
 var userStates = {}; // Clave: socket.id, Valor: { id: socket.id, screenId: null }
@@ -128,9 +127,8 @@ function handleSocketConnection(io) {
 
     // El usuario selecciona una rutina (en data vienen las rutinas seleccionadas)
     socket.on('selected_routine', async (data) => { //Asumamos que en la parte del cliente se concadenaron las rutinas
-        userRoutines[data.UserId] = data.routine; // Asignar rutina al usuario
+        await saveUserRoutines(data);
         console.log(`Rutina asignada a ${data.UserId}:`, data.routine);
-        await saveUserRoutines();
         // Enviar confirmación al usuario
         socket.emit('routine_assigned', { message: "Rutina asignada correctamente", routine: data.routine });
     });

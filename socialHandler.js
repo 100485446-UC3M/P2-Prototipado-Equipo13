@@ -18,3 +18,6 @@ async function addToStat(UserId, exercise ){
         return { error: "Error al actualizar los ejercicios completados." };
         }
 }
+module.exports = {
+    addToStat
+  };
