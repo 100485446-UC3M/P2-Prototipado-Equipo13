@@ -3,9 +3,9 @@ const connectedScreens = new Map(); // Asocia screenId -> socket
 const ADMIN_ROOM = 'admin_listeners'; // Nombre constante para la sala de admins
 
 const fs = require('fs').promises; 
-const { getRoutines } = require('./routines/routineSelector'); // Importar la función para manejar rutinas
-const { getNextExercise } = require('./routines/routineHandler');
-const userRoutinesFile = 'DataBases/userRoutines.json';
+const { getRoutines, getNextExercise, addRoutine, saveUserRoutines } = require('./routines/routineHandler'); // Importar la función para manejar rutinas
+const { addAdmin, checkAdmin} = require('./adminHandler');
+const {addToStat}  = require('./socialHandler');
 var userRoutines = {}; 
 
 const userStateFile = 'DataBases/userStateFile.json'; // Persiste info temporal de la conexión
@@ -27,7 +27,6 @@ function handleSocketConnection(io) {
       if (!userStates[data.UserId]) {
         console.log(`No existe estado para ${data.UserId}. Creando entrada.`);
         userStates[data.UserId] = {
-          id: data.UserId, // Identificador de la conexión actual
           screenId: data.screenId, // la pantalla
           socket: socket.id //Socket actual
         };
@@ -38,7 +37,7 @@ function handleSocketConnection(io) {
         console.log(`Estado existente encontrado para ${socket.UserId}.`);
       }
       console.log('Cliente conectado:', data.UserId);
-  });
+    });
 
     //Mantenemos esta relación porque queremos que cuando un usuario con un SocketId se mueva a otra pantalla
     //Pueda retomar su rutina desde la misma
@@ -65,12 +64,13 @@ function handleSocketConnection(io) {
       }
     });
 
-    // --- Registro de Administradores ---
+    // Registro de Administradores 
     // Listener para que los admins se identifiquen 
-    socket.on('register_admin', () => {
+    socket.on('register_admin', (data) => {
       console.log(`Admin conectado y registrado: ${socket.id}`);
+      let success = await addAdmin(data)
       socket.join(ADMIN_ROOM); // Unir al admin a la sala de escucha
-      // Opcional: Enviar al admin recién conectado el estado actual de todas las pantallas
+      // Enviar al admin recién conectado el estado actual de todas las pantallas
       const currentScreenStatus = Array.from(connectedScreens.keys()).map(id => ({
          screenId: id,
          status: 'connected',
@@ -79,38 +79,41 @@ function handleSocketConnection(io) {
       socket.emit('initial_screen_states', currentScreenStatus); // Enviar solo al admin que se acaba de conectar
     });
 
+    //Para agregar rutinas (Asumimos que los valores vienen en formato diccionario de diccionarios, como en el JSON)
+    socket.on('addRoutine', async (data) => {
+      console.log(`Recibido 'addRoutine' de ${socket.id}. Verificando si es admin.`);
+      if (!socket.isAdmin) { 
+          console.warn(`Intento no autorizado de 'addRoutine' desde ${socket.id}.`);
+          socket.emit('addRoutine_response', {
+              success: false,
+              message: 'No tienes permisos para realizar esta acción.'
+          });
+          return;
+      }
+      console.log(`Socket ${socket.id} es admin. Procesando 'addRoutine'.`);
 
-    // --- Manejo de Desconexión (Aplica a Pantallas Y Admins) ---
-    socket.on('disconnect', () => {
-      console.log(`Cliente desconectado: ${socket.id}`);
-
-      let disconnectedScreenId = null;
-
-      // Limpiar registro y salas si era una PANTALLA
-      for (const [screenId, screenSocket] of connectedScreens.entries()) {
-        if (screenSocket.id === socket.id) {
-          disconnectedScreenId = screenId; // Guarda el ID de la pantalla desconectada
-          connectedScreens.delete(screenId);
-          console.log(`Pantalla ${screenId} desconectada.`);
-          // Nota: Socket.IO maneja automáticamente la salida de las salas al desconectar.
-          break; // Salir del bucle una vez encontrado
-        }
+      let success = await addRoutine(data);
+       
+      if (success == -1){
+        socket.emit('addRoutine_response', {
+          success: false,
+          message: 'Error interno del servidor al intentar guardar la rutina.'
+        })
       }
 
-      //  Si se desconectó una PANTALLA, notificar a los admins 
-      if (disconnectedScreenId) {
-        io.to(ADMIN_ROOM).emit('screen_status_update', {
-          screenId: disconnectedScreenId,
-          status: 'disconnected'
+      else if (success == -2){
+        socket.emit('addRoutine_response', {
+                      success: false,
+                      message: `Ya existe una rutina llamada "${newRoutine.name}" en el grupo "${muscleGroup}".`});
+                    }
+              
+      else if (succes == 1){
+        socket.emit('addRoutine_response', {
+          success: true,
+          message: `Rutina "${newRoutine.name}" añadida correctamente al grupo "${muscleGroup}".`,
         });
-      } else {
-         // Si no era una pantalla, pudo ser un admin. No necesitamos acción específica
-         // para la desconexión del admin aquí, a menos que queramos rastrearlos.
-         console.log(`Admin u otro cliente (${socket.id}) desconectado.`);
       }
-
-    });   
-
+    });
 
     // Dar opciones de una rutina (asumimos que en data vienen los músculos de los que quiere hacer una rutina)
     socket.on('routine_selection', async (data) => {
@@ -128,15 +131,17 @@ function handleSocketConnection(io) {
         socket.emit('routine_assigned', { message: "Rutina asignada correctamente", routine: data.routine });
     });
 
-    socket.on('next_exercise', async (data) => {
+    socket.on('exercise_completed', async (data) => {
+      await addToStat(data.UserId, data.exercise);
+      console.log(`Ejercicio ${data.exercise} guardado para el usuario ${data.UserId}`);
       const nextExercise = await getNextExercise(data.UserId);
       socket.emit('exercise_response', nextExercise);
+
     });
     
   });
 
 }
-
 
 //  Función para cargar estados de conexión 
 async function loadUserStates() {
@@ -178,16 +183,6 @@ async function saveUserStates() {
 function broadcastToAdmins(io, eventName, data) {
   io.to(ADMIN_ROOM).emit(eventName, data);
   console.log(`Emitiendo evento '${eventName}' a la sala de admins.`);
-}
-
-
-// Function to save routines to JSON file
-async function saveUserRoutines() {
-    try {
-        await fs.writeFile(userRoutinesFile, JSON.stringify(userRoutines, null, 2), 'utf-8');
-    } catch (error) {
-        console.error("Error saving user routines:", error.message);
-    }
 }
 
 module.exports = {

@@ -1,12 +1,26 @@
 {
-    "Pierna": {
-        "ejercicio1": "Sentadillas",
-        "ejercicio2": "Prensa de piernas",
-        "ejercicio3": "Estocadas"
-    },
-    "Brazo": {
-        "ejercicio1": "Curl de bíceps",
-        "ejercicio2": "Fondos en paralelas",
-        "ejercicio3": "Press de hombros"
-    }
-}
+    "Pierna": [
+      {
+        "name": "Rutina Básica Pierna",
+        "addedBy": "admin_socket_id_o_identificador",
+        "addedAt": "2023-10-27T10:00:00.000Z",
+        "exercises": {
+          "ejercicio1": "Sentadillas",
+          "ejercicio2": "Prensa de piernas",
+          "ejercicio3": "Estocadas"
+        }
+      }
+    ],
+    "Brazo": [
+      {
+        "name": "Rutina Inicial Brazo",
+        "addedBy": "admin_socket_id_o_identificador",
+        "addedAt": "2023-10-27T10:05:00.000Z",
+        "exercises": {
+          "ejercicio1": "Curl de bíceps",
+          "ejercicio2": "Fondos en paralelas",
+          "ejercicio3": "Press de hombros"
+        }
+      }
+    ]
+  }
