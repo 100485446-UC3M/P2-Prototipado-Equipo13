@@ -3,9 +3,14 @@ const connectedScreens = new Map(); // Asocia screenId -> socket
 const ADMIN_ROOM = 'admin_listeners'; // Nombre constante para la sala de admins
 
 const fs = require('fs').promises; 
-const { getRoutines, getNextExercise, addRoutine, saveUserRoutines } = require('./routines/routineHandler'); // Importar la función para manejar rutinas
+
+// Importar las funciones necesarias de otros ficheros
+const { getRoutines, getNextExercise, addRoutine, saveUserRoutines,
+      seeAllExercises, addExercise, deleteExericse, recommendRoutine,
+      recordVideo} = require('./routineHandler'); 
 const { addAdminCredential, checkAdminCredentials} = require('./adminHandler');
-const {addToStat}  = require('./socialHandler');
+const {addToStat, seeStats, addFriend, deleteFriend,
+      sendMessage}  = require('./socialHandler');
 
 const userStateFile = 'DataBases/userStateFile.json'; // Persiste info temporal de la conexión
 var userStates = {}; // Clave: socket.id, Valor: { id: socket.id, screenId: null }
@@ -140,7 +145,39 @@ function handleSocketConnection(io) {
       socket.emit('exercise_response', nextExercise);
 
     });
+
+    //Mensajes relacionados a rutina
     
+    //Para ver los ejercicios restantes
+    socket.on('see_all_exercises', async (data) => {});
+
+    //En caso que el usuario quiera añadir un ejercicio a la rutina
+    socket.on('add_exercise', async (data) => {});
+
+    //En caso que el usuario quiera eliminar un ejercicio de la rutina
+    socket.on('delete_exercise', async (data) => {});
+
+    //Si el usuario quiere que le recomendemos una rutina en base a sus preferencias
+    socket.on('recommend_routine', async (data) => {});
+
+    //Si el usuario quiere grabar un video
+    socket.on('record_video', async (data) => {})
+
+    //Mensajes relacionados a la red social
+    
+    //En caso que un usuario quiesese ver sus estadísticas
+    socket.on('see_stats', async (data) => {});
+
+    //Para agregar un usuario a la red de amigos
+    socket.on('add_friend', async (data) => {});
+
+    //Para borrar un amigo
+    socket.on('delete_friend', async (data) => {});
+
+    //Para mandar un mensaje a un amigo (puede ser un video)
+    socket.on('send_message', async (data) => {});
+    
+  
   });
 
 }

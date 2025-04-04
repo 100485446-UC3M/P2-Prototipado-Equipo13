@@ -111,6 +111,8 @@ async function getNextExercise(userId) {
             return { message: "Routine completed!" };
         }
 
+        //AGREGAR LÓGICA CON RESPECTO A ANÁLISIS DE OCUPACIÓN DEL GIMNASIO, ¿QUÉ EJERCICIO RECOMENDAR, SI EL SIGUIENTE ESTÁ OCUPADO?
+
         // Get the next exercise
         const nextExercise = routine.exercises[currentStep];
 
@@ -125,8 +127,27 @@ async function getNextExercise(userId) {
     }
 }
 
+//Para ver los ejercicios restantes
+async function seeAllExercises(UserId) {}
+
+//En caso que el usuario quiera añadir un ejercicio a la rutina
+async function addExercise(data) {}
+
+//En caso que el usuario quiera eliminar un ejercicio de la rutina
+async function deleteExericse(data) {}
+
+//Si el usuario quiere que le recomendemos una rutina en base a sus preferencias
+async function recommendRoutine(UserId) {}
+
+//Si el usuario quiere grabar un video
+async function recordVideo(UserID) {}
 
 module.exports = { getRoutines,
                 getNextExercise,
                 addRoutine,
-                saveUserRoutines };
+                saveUserRoutines,
+                seeAllExercises,
+                addExercise,
+                deleteExericse,
+                recommendRoutine,
+                recordVideo };

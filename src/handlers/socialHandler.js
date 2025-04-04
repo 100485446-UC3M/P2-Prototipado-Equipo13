@@ -18,6 +18,24 @@ async function addToStat(UserId, exercise ){
         return { error: "Error al actualizar los ejercicios completados." };
         }
 }
+
+//En caso que un usuario quiesese ver sus estadísticas
+async function seeStats(data){}
+
+//Para agregar un usuario a la red de amigos
+async function addFriend(data){}
+
+//Para borrar un amigo
+async function deleteFriend(data){}
+
+//Para mandar un mensaje a un amigo (puede ser un video)
+async function sendMessage(data){}
+
+
 module.exports = {
-    addToStat
+    addToStat,
+    seeStats,
+    addFriend,
+    deleteFriend,
+    sendMessage
   };

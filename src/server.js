@@ -4,6 +4,7 @@ const { Server } = require('socket.io'); // Clase Servidor de Socket.IO (Usado p
 const app = express(); // Instancia de Express
 const server = http.createServer(app); // Servidor HTTP basado en Express
 const io = new Server(server); // Instancia del servidor Socket.IO
+const { handleSocketConnection} = require('./src/handlers/SocketHandler');
 
 handleSocketConnection(io); // <--- Pasa 'io' a la función
 
