@@ -1,0 +1,43 @@
+# Node.js dependencies
+node_modules/
+
+# Archivos de credenciales o datos sensibles
+# Databases/credentials.json
+# Databases/userStateFile.json
+# Databases/userRoutinesFile.json
+
+# Archivos de bases de datos locales o temporales
+*.sqlite
+*.db
+*.log
+*.pid
+*.seed
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de editores
+.vscode/
+.idea/
+*.code-workspace
+
+# Archivos temporales de desarrollo
+*.swp
+*~
+*.bak
+
+# Archivos de entorno
+.env
+.env.*
+
+# Archivos generados por tests
+coverage/
+.nyc_output/
+jest-*.json
+
+# Cachés
+.cache/
+dist/
+build/
+tmp/
