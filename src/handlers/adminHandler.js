@@ -81,6 +81,7 @@ async function addAdminCredential(data){
             await fs.writeFile(CREDENTIALS_FILE_PATH, jsonData, 'utf-8');
             console.log(`Admin '${data.username}' añadido exitosamente a ${path.basename(CREDENTIALS_FILE_PATH)}.`);
             return true; // Éxito
+
         } catch (writeError) {
             console.error(`Error fatal al escribir en el archivo de credenciales: ${writeError.message}`);
             return false; // Fallo al escribir
@@ -104,7 +105,7 @@ async function checkAdminCredentials(data) {
     // Validación básica de entrada
     if (!data.username || data.password === undefined || data.password === null) {
         console.warn("Intento de verificación con username o password faltantes.");
-        return 0; // No se puede verificar sin ambos datos
+        return { error: "Faltan datos" }; // No se puede verificar sin ambos datos
     }
 
     try {
@@ -118,13 +119,13 @@ async function checkAdminCredentials(data) {
             } else {
                 console.error(`Error al leer el archivo de credenciales: ${readError.message}`);
             }
-            return -1; // No se pueden verificar credenciales si el archivo falla
+            return { error: "fallo de archivo" }; // No se pueden verificar credenciales si el archivo falla
         }
 
         // Comprobar si el archivo está vacío
          if (fileContent.trim() === '') {
             console.warn(`El archivo de credenciales ${path.basename(CREDENTIALS_FILE_PATH)} está vacío.`);
-            return -1; // No hay credenciales que verificar
+            return { error: "No exiisten admins" }; // No hay credenciales que verificar
         }
 
         // Intentar parsear el JSON
@@ -134,7 +135,7 @@ async function checkAdminCredentials(data) {
         
         if (!allCredentials || typeof allCredentials !== 'object' || !allCredentials.hasOwnProperty('Admins') || typeof allCredentials.Admins !== 'object' || allCredentials.Admins === null) {
             console.error(`Error: El archivo de credenciales ${path.basename(CREDENTIALS_FILE_PATH)} no tiene la clave 'Admins' o esta no es un objeto válido.`);
-            return -1; // Estructura incorrecta
+            return { error: "Error Interno base de datos." }; // Estructura incorrecta
         }
          // Obtener el objeto específico de credenciales de administrador
          const adminCredentials = allCredentials.Admins;
@@ -151,12 +152,12 @@ async function checkAdminCredentials(data) {
                 } else {
                     // Contraseña incorrecta para un admin existente
                     console.log(`Contraseña de ADMIN incorrecta para el usuario: ${data.username}.`);
-                    return 0;
+                    return { error: "Contraseña incorrecta"};
                 }
             } else {
                 // El formato es incorrecto para este admin (no es un array)
                 console.warn(`Formato inválido en ${path.basename(CREDENTIALS_FILE_PATH)} para el ADMIN '${data.username}'. Se esperaba un array de contraseñas.`);
-                return -1
+                return { error: "Error Interno base de datos" };
             }
         } else {
             // El nombre de usuario admin no existe en la sección "Admins"

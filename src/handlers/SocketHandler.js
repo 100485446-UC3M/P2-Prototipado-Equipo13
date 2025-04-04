@@ -25,7 +25,7 @@ function handleSocketConnection(io) {
     socket.currentUserId = null;
     socket.currentScreenId = null;
 
-    // --- Listener para el mensaje de identificación del cliente ---
+    //  Listener para el mensaje de identificación del cliente 
     socket.on('user_identified', async (data) => {
       console.log(`Verificando estado para nueva conexión: ${data.UserId}`);
       if (!userStates[data.UserId]) {
@@ -91,8 +91,8 @@ function handleSocketConnection(io) {
       console.log(`Recibido 'addRoutine' de ${socket.id}. Verificando si es admin.`);
       let admin_identifier = await checkAdminCredentials(data.username, data.password);
       if (admin_identifier != 1) { 
-          console.warn(`Intento no autorizado de 'addRoutine' desde ${socket.id}.`);
-          socket.emit('addRoutine_response', {
+          console.warn(admin_identifier);
+          socket.emit('response_add_routine', {
               success: false,
               message: 'No tienes permisos para realizar esta acción.'
           });
