@@ -31,7 +31,7 @@ async function addRoutine(data){
         const existingRoutineIndex = definedRoutines[muscleGroup].findIndex(r => r.name.toLowerCase() === newRoutine.name.toLowerCase());
         if (existingRoutineIndex !== -1) {
              console.warn(`Intento de agregar rutina duplicada: "${newRoutine.name}" en grupo "${muscleGroup}" por ${socket.id}`);
-             return -2
+             return { error: "Intento de agregar rutina duplicada"};
             }
 
         // Añadir la nueva rutina al array del grupo muscular correspondiente
@@ -50,9 +50,9 @@ async function addRoutine(data){
 
     } catch (error) {
         console.error(`Error procesando 'addRoutine' :`, error);
-        return -1
-    };
-};
+        return { error: "Error general al agregar rutina"};;
+    }
+}
 
 const fs = require('fs').promises;
 
@@ -123,21 +123,138 @@ async function getNextExercise(userId) {
         return { nextExercise };
     } catch (error) {
         console.error("Error getting next exercise:", error.message);
-        return { error: "Error accessing routine data." };
+        return { error: "Error accessing routine data." }
     }
 }
 
 //Para ver los ejercicios restantes
-async function seeAllExercises(UserId) {}
+async function seeAllExercises(UserId){
+    try {
+        const data = await fs.readFile(userRoutinesFile, 'utf-8');
+        const userRoutines = JSON.parse(data);
+
+        if (!userRoutines[UserId]) {
+            return { error: "No routine found for this user." };
+        }
+        return userRoutines
+    } catch (error) {
+        console.error("Error getting next exercise:", error.message);
+        return { error: "Error accessing routine data." }
+    }
+}
+
 
 //En caso que el usuario quiera añadir un ejercicio a la rutina
-async function addExercise(data) {}
+async function addExercise(data) {
+
+    const userId = data.UserId;
+    const exerciseToAdd = data.exercise.trim(); 
+
+    try {
+        let userRoutines = {};
+        try {
+            const fileData = await fs.readFile(userRoutinesFile, 'utf-8');
+            // Recomiendan hacer trim
+            userRoutines = fileData.trim() ? JSON.parse(fileData) : {};
+        } catch (readError) {
+            if (readError.code === 'ENOENT') {
+                console.log(`Archivo ${userRoutinesFile} no encontrado. No se puede añadir ejercicio.`);
+                return { error: `El usuario ${userId} no tiene una rutina definida (archivo no existe).` };
+            }
+        }
+        const userData = userRoutines[userId];
+
+        if (!userData) {
+            console.warn(`addExercise: Usuario ${userId} no encontrado en ${userRoutinesFile}.`);
+            return { error: `El usuario ${userId} no tiene una rutina definida.` };
+        }
+
+        // Revisar la estructura
+        if (!userData.routine || !Array.isArray(userData.routine.exercises)) {
+            console.error(`addExercise: Estructura de rutina inválida para el usuario ${userId}.`, userData);
+            return { error: `Estructura de rutina inválida para el usuario ${userId}. No se pudo añadir el ejercicio.` };
+        }
+
+        // Revisar si el ejercicio ya existe
+        if (userData.routine.exercises.includes(exerciseToAdd)) {
+            console.log(`addExercise: El ejercicio "${exerciseToAdd}" ya existe en la rutina de ${userId}.`);
+            return { message: `El ejercicio "${exerciseToAdd}" ya está en la rutina.` };
+        }
+
+        // Agregar nuevo ejercicio
+        userData.routine.exercises.push(exerciseToAdd);
+        console.log(`Ejercicio "${exerciseToAdd}" añadido a la rutina de ${userId}.`);
+
+        await fs.writeFile(userRoutinesFile, JSON.stringify(userRoutines, null, 4), 'utf-8');
+
+        return 1;
+
+    } catch (error) {
+        // Error general
+        console.error(`Error en addExercise para ${userId}:`, error);
+        return { error: "Error interno del servidor al intentar añadir el ejercicio." };
+    }
+}
 
 //En caso que el usuario quiera eliminar un ejercicio de la rutina
-async function deleteExericse(data) {}
+async function deleteExercise(data) {
+    
+    const userId = data.UserId;
+    const exerciseToDelete = data.exercise.trim(); 
+
+    try {
+        try {
+            const fileData = await fs.readFile(userRoutinesFile, 'utf-8');
+            // Recomiendan hacer trim
+            userRoutines = fileData.trim() ? JSON.parse(fileData) : {};
+        } catch (readError) {
+            if (readError.code === 'ENOENT') {
+                console.log(`Archivo ${userRoutinesFile} no encontrado. No se puede remover ejercicio.`);
+                return { error: `El usuario ${userId} no tiene una rutina definida (archivo no existe).` };
+            }
+        }
+        const userData = userRoutines[userId];
+
+        if (!userData) {
+            console.warn(`deleteExercise: Usuario ${userId} no encontrado en ${userRoutinesFile}.`);
+            return { error: `El usuario ${userId} no tiene una rutina definida.` };
+        }
+
+        // Revisar la estructura
+        if (!userData.routine || !Array.isArray(userData.routine.exercises)) {
+            console.error(`addExercise: Estructura de rutina inválida para el usuario ${userId}.`, userData);
+            return { error: `Estructura de rutina inválida para el usuario ${userId}. No se pudo remover el ejercicio.` };
+        }
+
+        // Revisar si el ejercicio existe
+        if (!userData.routine.exercises.includes(exerciseToDelete)) {
+            console.log(`addExercise: El ejercicio "${exerciseToDelete}" no  çexiste en la rutina de ${userId}.`);
+            return { error: `El ejercicio "${exerciseToDelete}" no está en la rutina.` };
+        }
+
+        // Eliminar ejercicio
+         const updatedExercises = userData.routine.exercises.filter(
+            exerciseInList => exerciseInList !== exerciseToDelete
+        );
+
+        console.log(`Ejercicio "${exerciseToDelete}" removido a la rutina de ${userId}.`);
+
+        userData.routine.exercises = updatedExercises;
+        await fs.writeFile(userRoutinesFile, JSON.stringify(userRoutines, null, 4), 'utf-8');
+
+        return 1;
+
+    } catch (error) {
+        // Error general
+        console.error(`Error en deleteExercise para ${userId}:`, error);
+        return { error: "Error interno del servidor al intentar remover el ejercicio." };
+    }
+}
 
 //Si el usuario quiere que le recomendemos una rutina en base a sus preferencias
-async function recommendRoutine(UserId) {}
+async function recommendRoutine(UserId) {
+    
+}
 
 //Si el usuario quiere grabar un video
 async function recordVideo(UserID) {}
@@ -148,6 +265,6 @@ module.exports = { getRoutines,
                 saveUserRoutines,
                 seeAllExercises,
                 addExercise,
-                deleteExericse,
+                deleteExercise,
                 recommendRoutine,
                 recordVideo };

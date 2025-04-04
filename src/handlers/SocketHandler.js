@@ -13,7 +13,7 @@ const {addToStat, seeStats, addFriend, deleteFriend,
       sendMessage}  = require('./socialHandler');
 
 const userStateFile = 'DataBases/userStateFile.json'; // Persiste info temporal de la conexión
-var userStates = {}; // Clave: socket.id, Valor: { id: socket.id, screenId: null }
+let userStates = {}; // Clave: socket.id, Valor: { id: socket.id, screenId: null }
 loadUserStates()
 
 function handleSocketConnection(io) {
@@ -41,7 +41,7 @@ function handleSocketConnection(io) {
         console.log(`Estado existente encontrado para ${data.UserId}.`);
       }
       console.log('Cliente conectado:', data.UserId);
-    });
+    })
 
     //Mantenemos esta relación porque queremos que cuando un usuario con un SocketId se mueva a otra pantalla
     //Pueda retomar su rutina desde la misma
@@ -87,7 +87,7 @@ function handleSocketConnection(io) {
     });
 
     //Para agregar rutinas (Asumimos que los valores vienen en formato diccionario de diccionarios, como en el JSON)
-    socket.on('addRoutine', async (data) => {
+    socket.on('add_routine', async (data) => {
       console.log(`Recibido 'addRoutine' de ${socket.id}. Verificando si es admin.`);
       let admin_identifier = await checkAdminCredentials(data.username, data.password);
       if (admin_identifier != 1) { 
@@ -100,33 +100,15 @@ function handleSocketConnection(io) {
       }
       console.log(`Socket ${socket.id} es admin. Procesando 'addRoutine'.`);
 
-      let success = await addRoutine(data);
-       
-      if (success == -1){
-        socket.emit('addRoutine_response', {
-          success: false,
-          message: 'Error interno del servidor al intentar guardar la rutina.'
-        })
-      }
-
-      else if (success == -2){
-        socket.emit('addRoutine_response', {
-                      success: false,
-                      message: `Ya existe una rutina llamada "${newRoutine.name}" en el grupo "${muscleGroup}".`});
-                    }
-              
-      else if (succes == 1){
-        socket.emit('addRoutine_response', {
-          success: true,
-          message: `Rutina "${newRoutine.name}" añadida correctamente al grupo "${muscleGroup}".`,
-        });
-      }
+      let result = await addRoutine(data);
+      
+      socket.emit('response_add_routine', result);
     });
 
     // Dar opciones de una rutina (asumimos que en data vienen los músculos de los que quiere hacer una rutina)
     socket.on('routine_selection', async (data) => {
         const selectedRoutines = await getRoutines(data.preferences);
-        socket.emit('routine_response', selectedRoutines);
+        socket.emit('response_routine_selection', selectedRoutines);
     });
 
 
@@ -135,51 +117,78 @@ function handleSocketConnection(io) {
         await saveUserRoutines(data);
         console.log(`Rutina asignada a ${data.UserId}:`, data.routine);
         // Enviar confirmación al usuario
-        socket.emit('routine_assigned', { message: "Rutina asignada correctamente", routine: data.routine });
+        socket.emit('response_selected_routine', { message: "Rutina asignada correctamente", routine: data.routine });
     });
 
     socket.on('exercise_completed', async (data) => {
       await addToStat(data.UserId, data.exercise);
       console.log(`Ejercicio ${data.exercise} guardado para el usuario ${data.UserId}`);
       const nextExercise = await getNextExercise(data.UserId);
-      socket.emit('exercise_response', nextExercise);
+      socket.emit('response_exercise_complete', nextExercise);
 
     });
 
     //Mensajes relacionados a rutina
     
     //Para ver los ejercicios restantes
-    socket.on('see_all_exercises', async (data) => {});
+    socket.on('see_all_exercises', async (data) => {
+      let full_routine = seeAllExercises(data);
+      socket.emit("response_see_all_exercises", full_routine); //full_routine puede contener la rutina o el error
+    });
 
     //En caso que el usuario quiera añadir un ejercicio a la rutina
-    socket.on('add_exercise', async (data) => {});
+    socket.on('add_exercise', async (data) => {
+      let updated_routine = addExercise(data);
+      socket.emit("response_add_exercise", updated_routine); //updated_routine puede contener la rutina o el error
+    });
 
     //En caso que el usuario quiera eliminar un ejercicio de la rutina
-    socket.on('delete_exercise', async (data) => {});
+    socket.on('delete_exercise', async (data) => {
+      let updated_routine = deleteExercise(data);
+      socket.emit("response_delete_exercise", updated_routine); //updated_routine puede contener la rutina o el error
+    });
 
     //Si el usuario quiere que le recomendemos una rutina en base a sus preferencias
-    socket.on('recommend_routine', async (data) => {});
+    socket.on('recommend_routine', async (data) => {
+      let recommended_routine = recommendRoutine(data);
+      socket.emit("response_recommend_routine", recommended_routine); //recommended_routine puede contener la rutina o el error
+    });
 
     //Si el usuario quiere grabar un video
-    socket.on('record_video', async (data) => {})
+    socket.on('record_video', async (data) => {
+      let video_result = recordVideo(data);
+      socket.emit("response_record_video", video_result); //video_result puede contener la rutina o el error
+    });
 
     //Mensajes relacionados a la red social
     
     //En caso que un usuario quiesese ver sus estadísticas
-    socket.on('see_stats', async (data) => {});
+    socket.on('see_stats', async (data) => {
+      const exercises_completed = await seeStats(data)
+      socket.emit("completed_exercises", exercises_completed)
+    }); 
 
     //Para agregar un usuario a la red de amigos
-    socket.on('add_friend', async (data) => {});
+    socket.on('add_friend', async (data) => {
+      const result = await addFriend(data)
+      if (result == 1){
+        socket.emit('friend_added');
+      }
+      socket.emit("error_adding_friend", result)
+    });
 
     //Para borrar un amigo
-    socket.on('delete_friend', async (data) => {});
+    socket.on('delete_friend', async (data) => {
+    const result = await deleteFriend(data)
+      socket.emit('friend_deleted_result', result);
+    });
 
     //Para mandar un mensaje a un amigo (puede ser un video)
-    socket.on('send_message', async (data) => {});
-    
-  
-  });
+    socket.on('send_message', async (data) => {
 
+    });
+    
+  })
 }
 
 //  Función para cargar estados de conexión 
