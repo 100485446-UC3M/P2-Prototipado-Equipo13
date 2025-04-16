@@ -74,15 +74,15 @@ function handleSocketConnection(io) {
       console.log(`Admin conectado y registrado: ${socket.id}`);
       let success = await addAdminCredential(data.username, data.password)
       if (success == 1){
-      socket.join(ADMIN_ROOM); // Unir al admin a la sala de escucha
-      // Enviar al admin recién conectado el estado actual de todas las pantallas
-      const currentScreenStatus = Array.from(connectedScreens.keys()).map(id => ({
-         screenId: id,
-         status: 'connected',
-         socketId: connectedScreens.get(id)?.id // Añadir socketId si existe
-       }));
-      socket.emit('initial_screen_states', currentScreenStatus); // Enviar solo al admin que se acaba de conectar
-      }else {socket.emit('Was not able to be added'); // Enviar solo al admin que se acaba de conectar} 
+        socket.join(ADMIN_ROOM); // Unir al admin a la sala de escucha
+        // Enviar al admin recién conectado el estado actual de todas las pantallas
+        const currentScreenStatus = Array.from(connectedScreens.keys()).map(id => ({
+          screenId: id,
+          status: 'connected',
+          socketId: connectedScreens.get(id)?.id // Añadir socketId si existe
+        }));
+        socket.emit('initial_screen_states', currentScreenStatus); // Enviar solo al admin que se acaba de conectar
+        }else {socket.emit('Was not able to be added'); // Enviar solo al admin que se acaba de conectar} 
       }
     });
 
@@ -162,7 +162,7 @@ function handleSocketConnection(io) {
 
     //Mensajes relacionados a la red social
     
-    //En caso que un usuario quiesese ver sus estadísticas
+    //En caso que un usuario quisiese ver sus estadísticas
     socket.on('see_stats', async (data) => {
       const exercises_completed = await seeStats(data)
       socket.emit("completed_exercises", exercises_completed)

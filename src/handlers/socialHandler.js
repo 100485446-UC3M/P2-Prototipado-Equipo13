@@ -66,7 +66,6 @@ async function addFriend(data){
 }
 }
 
-
 //Para borrar un amigo
 async function deleteFriend(data){
     try {
