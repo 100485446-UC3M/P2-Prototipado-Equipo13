@@ -1,8 +1,8 @@
 const fs = require('fs').promises;
-const credentials = 'DataBases/credentials.json';
+const CREDENTIALS_FILE_PATH = '../Databases/credentials.json';
 
-//Registrar nuevo admin
-async function addAdminCredential(data){
+// Registrar nuevo usuario/admin
+async function addCredentials(data){
     // Validación básica de entrada
     if (!data.username || typeof data.username !== 'string' || data.username.trim() === '') {
         console.error("Error al añadir admin: El nombre de usuario no puede estar vacío.");
@@ -98,8 +98,8 @@ async function addAdminCredential(data){
     }
 }
 
-//Chequear si alguien es admin
-async function checkAdminCredentials(data) {
+// Revisar credenciales
+async function checkCredentials(data) {
     console.log(`Verificando credenciales para usuario: ${data.username}`);
 
     // Validación básica de entrada
@@ -178,6 +178,6 @@ async function checkAdminCredentials(data) {
 
 // Exportar la función para que pueda ser usada en otros archivos
 module.exports = {
-    checkAdminCredentials,
-    addAdminCredential
+    checkCredentials,
+    addCredentials
 };

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link rel="stylesheet" href="styles.css">
+<title>Pantalla Gym – FitGame</title>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">⚡FitGame</div>
+  <nav>
+    <ul>
+      <li><a href="gym.html">Pantalla Gym</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main id="gym-screen">
+  <h2 class="center">Rutina: Full Body Blast</h2>
+
+  <div class="exercise-display">
+    <video id="exerciseVideo" autoplay loop muted></video>
+    <h3 id="exerciseName">-</h3>
+    <div class="timer" id="exerciseTimer">00:00</div>
+    <div class="connection-indicator">
+      <span class="dot"></span><span>Conectado</span>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <div class="next-exercise">Próximo: <span id="nextExerciseName">—</span></div>
+    <div class="controls">
+      <button>Iniciar</button><button>Pausa</button><button>Detener</button>
+    </div>
+  </div>
+</main>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="../public/gym.js"></script>
+
+</body>
+
+</html>

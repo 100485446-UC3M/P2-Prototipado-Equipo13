@@ -8,11 +8,11 @@ const fs = require('fs').promises;
 const { getRoutines, getNextExercise, addRoutine, saveUserRoutines,
       seeAllExercises, addExercise, deleteExericse, recommendRoutine,
       recordVideo} = require('./routineHandler'); 
-const { addAdminCredential, checkAdminCredentials} = require('./adminHandler');
+const { addCredentials, checkCredentials} = require('./credentialHandler');
 const {addToStat, seeStats, addFriend, deleteFriend,
       sendMessage}  = require('./socialHandler');
 
-const userStateFile = 'DataBases/userStateFile.json'; // Persiste info temporal de la conexión
+const userStateFile = 'src/DataBases/userStateFile.json'; // Persiste info temporal de la conexión
 let userStates = {}; // Clave: socket.id, Valor: { id: socket.id, screenId: null }
 loadUserStates()
 
@@ -62,34 +62,59 @@ function handleSocketConnection(io) {
           socketId: socket.id, 
           status: 'connected'
         });
-
       } else {
         console.warn(`Intento de registro de pantalla sin screenId desde socket ${socket.id}`);
       }
     });
 
-    // Registro de Administradores 
-    // Listener para que los admins se identifiquen 
-    socket.on('register_admin', async (data) => {
-      console.log(`Admin conectado y registrado: ${socket.id}`);
-      let success = await addAdminCredential(data.username, data.password)
+    // Registro de usuarios / admins
+    socket.on('register', async (data) => {
+      console.log(`${socket.id} quiere registrarse`);
+      let success = await addCredentials(data.username, data.password, data.type)
       if (success == 1){
-        socket.join(ADMIN_ROOM); // Unir al admin a la sala de escucha
-        // Enviar al admin recién conectado el estado actual de todas las pantallas
-        const currentScreenStatus = Array.from(connectedScreens.keys()).map(id => ({
-          screenId: id,
-          status: 'connected',
-          socketId: connectedScreens.get(id)?.id // Añadir socketId si existe
-        }));
-        socket.emit('initial_screen_states', currentScreenStatus); // Enviar solo al admin que se acaba de conectar
-        }else {socket.emit('Was not able to be added'); // Enviar solo al admin que se acaba de conectar} 
+        if (data.type === "Admin"){  
+          socket.join(ADMIN_ROOM); // Unir al admin a la sala de escucha
+          // Enviar al admin recién conectado el estado actual de todas las pantallas
+          const currentScreenStatus = Array.from(connectedScreens.keys()).map(id => ({
+            screenId: id,
+            status: 'connected',
+            socketId: connectedScreens.get(id)?.id // Añadir socketId si existe
+          }));
+          socket.emit('initial_screen_states', currentScreenStatus); // Enviar solo al admin que se acaba de conectar
+          
+        }
+        socket.emit('successful_register');
+      } else {
+        socket.emit('failed_register');
+      }
+    });
+
+    // Inicio de sesión de usuarios / admins
+    socket.on('login', async (data) => {
+      console.log(`${socket.id} quiere iniciar sesión`);
+      let success = await checkCredentials(data.username, data.password, data.type)
+      if (success == 1){
+        if (data.type === "Admin"){  
+          socket.join(ADMIN_ROOM); // Unir al admin a la sala de escucha
+          // Enviar al admin recién conectado el estado actual de todas las pantallas
+          const currentScreenStatus = Array.from(connectedScreens.keys()).map(id => ({
+            screenId: id,
+            status: 'connected',
+            socketId: connectedScreens.get(id)?.id // Añadir socketId si existe
+          }));
+          socket.emit('initial_screen_states', currentScreenStatus); // Enviar solo al admin que se acaba de conectar
+          
+        }
+        socket.emit('successful_login');
+      } else {
+        socket.emit('failed_login');
       }
     });
 
     //Para agregar rutinas (Asumimos que los valores vienen en formato diccionario de diccionarios, como en el JSON)
     socket.on('add_routine', async (data) => {
       console.log(`Recibido 'addRoutine' de ${socket.id}. Verificando si es admin.`);
-      let admin_identifier = await checkAdminCredentials(data.username, data.password);
+      let admin_identifier = await checkCredentials(data.username, data.password);
       if (admin_identifier != 1) { 
           console.warn(admin_identifier);
           socket.emit('response_add_routine', {
@@ -235,6 +260,6 @@ function broadcastToAdmins(io, eventName, data) {
 
 module.exports = {
   handleSocketConnection,
-  sendDataToScreen,
+  // sendDataToScreen,
   broadcastToAdmins 
 };

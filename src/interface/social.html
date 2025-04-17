@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link rel="stylesheet" href="styles.css">
+<title>App Usuario – FitGame</title>
+</head>
+
+<body>
+<header>
+  <div class="logo">⚡FitGame</div>
+  <nav>
+    <ul>
+      <li><a href="login.html">Iniciar Sesión</a></li>
+      <li><a href="routine.html">Rutina</a></li>
+      <li><a href="stats.html">Estadísticas</a></li>
+      <li><a href="social.html">Red Social</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main id="user-app" class="dashboard-cards">
+  <!-- Red Social -->
+  <section id="social" >
+    <div class="card">
+      <h2>Amigos & Chat</h2>
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>Amigos</h3>
+          <div id="friendList" class="friend-list"></div>
+          <button id="btnAddFriend" class="btn secondary" style="margin-top:.5rem;">Añadir amigo</button>
+        </div>
+        <div class="card">
+          <h3>Chat</h3>
+          <div class="chat-box" id="chatBox"></div>
+          <input id="chatInput" type="text" placeholder="Escribe tu mensaje..." style="width:100%;margin-top:.5rem;">
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="../public/user/social.js"></script>
+
+</body>
+</html>

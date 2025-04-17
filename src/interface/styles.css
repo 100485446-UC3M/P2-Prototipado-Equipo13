@@ -1,0 +1,253 @@
+:root {
+  --primary:#2795ff;
+  --primary-dark:#0e5ea8;
+  --secondary:#ffce54;
+  --bg:#f5f7fa;
+  --card-bg:#ffffff;
+  --text:#2e3e4e;
+  --success:#4caf50;
+  --danger:#e53935;
+  --radius:16px;
+  --shadow:0 4px 12px rgba(0,0,0,.1);
+  --transition:.25s ease-in-out;
+  font-size:16px;
+  font-family:'Trebuchet MS', Arial, sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+
+body{background:var(--bg);color:var(--text);line-height:1.5;}
+
+header{
+  background:var(--primary);
+  color:#fff;
+  padding:1rem 2rem;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  box-shadow:var(--shadow);
+}
+.logo{font-size:1.5rem;font-weight:bold;}
+nav ul{display:flex;gap:1rem;list-style:none;}
+nav a{color:#fff;text-decoration:none;position:relative;}
+nav a::after{content:'';position:absolute;left:0;bottom:-4px;height:2px;width:0;background:var(--secondary);transition:width var(--transition);}
+nav a:hover::after{width:100%;}
+
+main{padding:2rem;}
+
+.card{
+  background:var(--card-bg);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:1.25rem;
+  transition:transform var(--transition), box-shadow var(--transition);
+}
+.card:hover{transform:translateY(-4px);box-shadow:0 6px 16px rgba(0,0,0,.15);}
+.btn{
+  display:inline-block;
+  display:flex;                 /* ← antes inline‑block         */
+  align-items:center;           /* centra verticalmente         */
+  justify-content:center;       /* centra horizontalmente       */
+  background:var(--primary);
+  color:#fff;
+  padding:.5rem 1rem;
+  border:none;
+  border-radius:var(--radius);
+  cursor:pointer;
+  transition:background var(--transition);
+  text-decoration:none;
+  font-weight:600;
+  font-family:'Trebuchet MS', Arial, sans-serif; /* obliga la misma fuente en <a> y <button> */
+  font-size:1rem;               /* 1 rem = 16 px (igual para todos) */
+  line-height:1.2;
+  text-align:center;            /* respaldo si display cambia   */
+}
+.btn:hover{background:var(--primary-dark);}
+.btn.secondary{background:var(--secondary);color:#000;}
+.btn.danger{background:var(--danger);} 
+.grid{display:grid;gap:1.5rem;}
+/* Responsive grids */
+@media(min-width:768px){
+  .grid-2{grid-template-columns:repeat(2,1fr);} 
+  .grid-3{grid-template-columns:repeat(3,1fr);} 
+}
+
+/* ===== Gym Screen =====*/
+#gym-screen .exercise-display{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:1rem;
+  min-height:60vh;
+  text-align:center;
+}
+#gym-screen video,#gym-screen .exercise-animation{
+  width:320px;height:240px;background:#000;border-radius:var(--radius);
+}
+.timer{font-size:2rem;font-weight:bold;}
+.connection-indicator{display:flex;align-items:center;gap:.5rem;}
+.connection-indicator .dot{
+  width:12px;height:12px;border-radius:50%;
+  background:var(--success);
+}
+
+.sidebar{
+  background:var(--card-bg);
+  padding:1rem;
+  border-top:4px solid var(--primary);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.sidebar .next-exercise{font-weight:bold;}
+.controls{
+  display:flex;gap:.5rem;
+}
+
+.controls button{
+  background:var(--secondary);
+  border:none;
+  padding:.5rem 1rem;
+  border-radius:var(--radius);
+  cursor:pointer;
+  font-weight:bold;
+}
+.controls button:hover{background:#ffd76b;}
+
+/* ===== User App =====*/
+.login-form, .admin-login-form{
+  max-width:400px;
+  margin:2rem auto;
+  display:flex;
+  flex-direction:column;
+  gap:1rem;
+}
+input[type="text"],input[type="password"],select{
+  padding:.75rem 1rem;
+  border:1px solid #ccc;
+  border-radius:var(--radius);
+  font-size:1rem;
+  width:100%;
+  display:block;
+}
+.dashboard-cards{
+  display:grid;
+  gap:1rem;
+}
+.dashboard-cards .card .progress-bar{
+  margin-bottom:1rem;        /* espacio bajo la barra */
+}
+.dashboard-cards .card .btn{
+  margin-top:0;              /* por si hereda márgenes */
+}
+.progress-bar{
+  width:100%;
+  height:12px;
+  background:#e0e0e0;
+  border-radius:6px;
+  overflow:hidden;
+  margin-top:.5rem;
+}
+.progress-bar div{
+  height:100%;
+  background:var(--primary);
+  width:60%;
+}
+
+/*  Distribución de botones: 3 columnas iguales en una sola fila */
+.btn-group{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:.75rem;
+  margin-top:1rem;
+  margin-bottom:2rem;    /* añade espacio bajo el grupo de botones */
+}
+
+.btn-group .btn{
+  width:100%;          /* rellena su celda de grid */
+}
+/* gráfica placeholder */
+.chart-placeholder{
+  width:100%;
+  height:240px;
+  background:linear-gradient(135deg,#2795ff22 25%,transparent 25%,transparent 50%,#2795ff22 50%,#2795ff22 75%,transparent 75%,transparent);
+  background-size:40px 40px;
+  border-radius:var(--radius);
+} 
+.friend-list, .chat-list{
+  display:flex;
+  flex-direction:column;
+  gap:1rem;
+}
+.friend{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.friend .btn{
+  padding:.25rem .75rem;
+  font-size:.875rem;}
+.chat-box{
+  border:1px solid #ccc;
+  border-radius:var(--radius);
+  padding:1rem;
+  min-height:240px;
+}
+/* ===== Routine List =====*/
+.filter-bar{
+  display:flex;
+  gap:.5rem;
+  margin:1rem 0;
+  flex-wrap:wrap;
+}
+.routine-card{
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+
+/* ===== Admin Panel =====*/
+.table{
+  width:100%;
+  border-collapse:collapse;
+}
+.table th,.table td{
+  padding:.75rem;
+  border-bottom:1px solid #ddd;
+  text-align:left;
+}
+.badge{
+  padding:.25rem .5rem;
+  border-radius:var(--radius);
+  color:#fff;
+  font-size:.75rem;
+}
+.badge.connected{background:var(--success);}
+.badge.disconnected{background:var(--danger);} 
+.admin-grid{
+  display:grid;
+  gap:2rem;              /* separa verticalmente los menús/cards */
+}
+/* Toast */
+.toast{
+  position:fixed;
+  bottom:1rem;
+  right:1rem;
+  background:var(--primary);
+  color:#fff;
+  padding:.75rem 1rem;
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  opacity:0;
+  animation:fadeInOut 4s forwards;
+}
+@keyframes fadeInOut{
+  0%{opacity:0;right:-100px;}
+  10%{opacity:1;right:1rem;}
+  90%{opacity:1;}
+  100%{opacity:0;right:-100px;}
+}
+
+/* ===== Utility Classes =====*/
+.hidden{display:none;}
+.center{text-align:center;}
