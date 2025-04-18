@@ -19,7 +19,7 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 const server = http.createServer(app); // Servidor HTTP basado en Express
 
 const io = new Server(server); // Instancia del servidor Socket.IO
-const { handleSocketConnection } = require('./handlers/SocketHandler.js');
+const { handleSocketConnection } = require('./handlers/socketHandler.js');
 handleSocketConnection(io); // <--- Pasa 'io' a la función
 
 const PORT = process.env.PORT || 3000;

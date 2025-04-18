@@ -12,7 +12,7 @@ const { addCredentials, checkCredentials} = require('./credentialHandler');
 const {addToStat, seeStats, addFriend, deleteFriend,
       sendMessage}  = require('./socialHandler');
 
-const userStateFile = 'src/DataBases/userStateFile.json'; // Persiste info temporal de la conexión
+const userStateFile = 'src/Databases/userStateFile.json'; // Persiste info temporal de la conexión
 let userStates = {}; // Clave: socket.id, Valor: { id: socket.id, screenId: null }
 loadUserStates()
 
