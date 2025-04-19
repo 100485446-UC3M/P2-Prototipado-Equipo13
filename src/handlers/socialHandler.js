@@ -18,7 +18,7 @@ async function addToStat(data){
     catch (error) {
         console.error('Error al marcar ejercicio como completado:', error);
         return { error: "Error al actualizar los ejercicios completados." };
-        }
+    }
 }
 
 //En caso que un usuario quiesese ver sus estadísticas
@@ -124,4 +124,4 @@ module.exports = {
     addFriend,
     deleteFriend,
     sendMessage
-  };
+};
