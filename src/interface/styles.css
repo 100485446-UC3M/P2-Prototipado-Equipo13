@@ -215,6 +215,38 @@ input[type="text"],input[type="password"],select{
     width:100%;
     display:block;
 }
+/* Boton de registro */
+#registerForm button[type="submit"] {
+    background-color: #4CAF50; /* Verde suave */
+    color: white;
+    padding: 12px 20px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+  }
+  
+#registerForm button[type="submit"]:hover {
+    background-color: #45a049; /* Verde un poco más oscuro */
+}
+/* Boton de login */
+#loginForm button[type="submit"] {
+    background-color: #4CAF50; /* Verde suave */
+    color: white;
+    padding: 12px 20px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+  }
+  
+#loginForm button[type="submit"]:hover {
+    background-color: #45a049; /* Verde un poco más oscuro */
+}
 .dashboard-cards{
     display:grid;
     gap:1rem;
