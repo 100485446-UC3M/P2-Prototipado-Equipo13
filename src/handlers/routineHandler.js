@@ -1,5 +1,5 @@
-const userRoutinesFile = 'DataBases/userRoutines.json';
-const RoutinesFile = 'DataBases/routines.json';
+const userRoutinesFile = 'src/Databases/userRoutinesFile.json';
+const RoutinesFile = 'src/Databases/routines.json';
 var userRoutines = {}; 
 
 //Funcion para agregar rutinas
@@ -111,7 +111,7 @@ async function getNextExercise(userId) {
             return { message: "Routine completed!" };
         }
 
-        //AGREGAR LÓGICA CON RESPECTO A ANÁLISIS DE OCUPACIÓN DEL GIMNASIO, ¿QUÉ EJERCICIO RECOMENDAR, SI EL SIGUIENTE ESTÁ OCUPADO?
+        // AGREGAR LÓGICA CON RESPECTO A ANÁLISIS DE OCUPACIÓN DEL GIMNASIO, ¿QUÉ EJERCICIO RECOMENDAR, SI EL SIGUIENTE ESTÁ OCUPADO?
 
         // Get the next exercise
         const nextExercise = routine.exercises[currentStep];
@@ -119,7 +119,6 @@ async function getNextExercise(userId) {
         // Update current step
         userRoutines[userId].currentStep += 1;
         await fs.writeFile(userRoutinesFile, JSON.stringify(userRoutines, null, 2), 'utf-8');
-
         return { nextExercise };
     } catch (error) {
         console.error("Error getting next exercise:", error.message);

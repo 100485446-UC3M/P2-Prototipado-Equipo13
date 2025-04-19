@@ -1,5 +1,5 @@
-const socialCompetitionFile = 'DataBases/socialCompetition.json';
-const friendsFile = 'DataBases/userFriends.json';
+const socialCompetitionFile = 'Databases/socialCompetition.json';
+const friendsFile = 'Databases/userFriends.json';
 let friendList = {}
 
 async function addToStat(data){
