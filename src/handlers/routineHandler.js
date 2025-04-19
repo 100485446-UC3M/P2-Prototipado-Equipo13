@@ -4,7 +4,6 @@ var userRoutines = {};
 
 //Funcion para agregar rutinas
 async function addRoutine(data){
-
     const { routineName, muscleGroup, exercises } = data;
     if (!routineName || !muscleGroup || !exercises || typeof exercises !== 'object' || Object.keys(exercises).length === 0) {
         console.error(`Datos inválidos recibidos en 'addRoutine' de ${socket.id}:`, data);

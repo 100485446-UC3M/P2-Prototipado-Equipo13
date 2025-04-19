@@ -1,37 +1,37 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<link rel="stylesheet" href="styles.css">
-<title>Login – FitGame</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login – ⚡FitGame</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <header>
-  <div class="logo">⚡FitGame</div>
-  <!-- No hace falta nav en la página de login -->
+	⚡FitGame
+	<!-- No hace falta nav en la página de login -->
 </header>
 
 <main id="login-page" class="centered-container">
-  <section id="login-panel">
-    <form id="loginForm" class="login-form">
-      <h2>Iniciar sesión</h2>
-      <input name="user" placeholder="Usuario" type="text" required>
-      <input name="password" placeholder="Contraseña" type="password" required>
-      <button type="submit" class="btn">Entrar</button>
-      <a href="" id="register_btn">Registrarse</a> 
-    </form>
-  </section>
+	<section id="login-panel">
+		<form id="loginForm" class="login-form">
+		<h2>Iniciar sesión</h2>
+		<input name="user" placeholder="Usuario" type="text" required>
+		<input name="password" placeholder="Contraseña" type="password" required>
+		<button type="submit" class="btn">Entrar</button>
+		<a href="" id="register_btn">Registrarse</a> 
+		</form>
+	</section>
 
-  <section id="register-panel" class="hidden">
-    <form id="registerForm" class="login-form">
-      <h2>Registrarse</h2>
-      <input name="user" placeholder="Usuario" type="text" required>
-      <input name="password" placeholder="Contraseña" type="password" required>
-      <button type="submit" class="btn">Entrar</button>
-      <a href="" id="login_btn">Iniciar sesión</a> 
-    </form>
-  </section>
+	<section id="register-panel" class="hidden">
+		<form id="registerForm" class="login-form">
+		<h2>Registrarse</h2>
+		<input name="user" placeholder="Usuario" type="text" required>
+		<input name="password" placeholder="Contraseña" type="password" required>
+		<button type="submit" class="btn">Entrar</button>
+		<a href="" id="login_btn">Iniciar sesión</a> 
+		</form>
+	</section>
 </main>
 
 <script src="/socket.io/socket.io.js"></script>
